@@ -82,15 +82,15 @@
 
     .polaroid-grande {
       background: #111;
-      padding: 14px 14px 34px 14px;
+      padding: 12px 12px 28px 12px;
       border-radius: 10px;
       border: 1px solid rgba(255, 204, 213, 0.5);
       box-shadow: 0 0 70px rgba(255, 42, 95, 0.8);
-      width: 260px;
-      max-width: 80vw;
+      width: 240px;
+      max-width: 75vw;
       transform: scale(0.7);
       animation: zoomInFoto 2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-      margin-bottom: 15px;
+      margin-bottom: 12px;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -98,7 +98,7 @@
 
     .polaroid-grande img {
       width: 100%;
-      height: 280px;
+      height: 250px;
       object-fit: cover;
       border-radius: 6px;
       display: block;
@@ -113,32 +113,67 @@
     #info-sorpresa {
       text-align: center;
       width: 90%;
-      max-width: 480px;
+      max-width: 500px;
       opacity: 0;
       animation: revealText 2s ease forwards 1s;
       display: flex;
       flex-direction: column;
       align-items: center;
+      pointer-events: auto;
     }
 
     #nombre {
       color: #ffccd5;
-      font-size: clamp(2.2rem, 5vw, 3.2rem);
+      font-size: clamp(2rem, 4.5vw, 2.8rem);
       font-weight: 300;
       letter-spacing: 6px;
       text-transform: uppercase;
       text-shadow: 0 0 25px rgba(255, 42, 95, 1), 0 0 50px rgba(255, 42, 95, 0.7);
-      margin-bottom: 8px;
+      margin-bottom: 6px;
     }
 
     .frase-amor {
       color: #ffb3c1;
-      font-size: 1rem;
+      font-size: 0.95rem;
       letter-spacing: 2px;
       font-style: italic;
-      line-height: 1.6;
+      line-height: 1.5;
       text-shadow: 0 0 12px rgba(0,0,0,0.9);
       text-align: center;
+      margin-bottom: 12px;
+    }
+
+    /* Contador de tiempo real */
+    #contador {
+      color: #ffccd5;
+      font-size: 0.85rem;
+      letter-spacing: 2px;
+      background: rgba(20, 20, 20, 0.7);
+      border: 1px solid rgba(255, 42, 95, 0.4);
+      padding: 8px 15px;
+      border-radius: 20px;
+      box-shadow: 0 0 15px rgba(255, 42, 95, 0.3);
+      margin-bottom: 12px;
+    }
+
+    /* Botón interactivo extra */
+    #btn-recuerdos {
+      background: transparent;
+      border: 1px solid #ffccd5;
+      color: #ffccd5;
+      padding: 8px 20px;
+      font-size: 0.8rem;
+      letter-spacing: 2px;
+      border-radius: 20px;
+      cursor: pointer;
+      text-transform: uppercase;
+      transition: all 0.3s ease;
+    }
+
+    #btn-recuerdos:hover {
+      background-color: #ff2a5f;
+      border-color: #ff2a5f;
+      box-shadow: 0 0 15px rgba(255, 42, 95, 0.8);
     }
 
     @keyframes revealText {
@@ -158,20 +193,65 @@
 
   <div id="carta-sorpresa">
     <div class="polaroid-grande">
-      <img src="https://i.postimg.cc/Z5y3fZWk/IMG-20260417-WA0068.jpg" alt="Mariel">
+      <img id="foto-principal" src="https://i.postimg.cc/Z5y3fZWk/IMG-20260417-WA0068.jpg" alt="Mariel">
     </div>
     <div id="info-sorpresa">
       <div id="nombre">Mariel</div>
       <div class="frase-amor">"Desde enero de 2021, cada segundo a tu lado se ha convertido en mi destino favorito..."</div>
+      <div id="contador">Calculando nuestro tiempo juntos...</div>
+      <button id="btn-recuerdos" onclick="cambiarRecuerdo()">✨ Otro recuerdo</button>
     </div>
   </div>
 
-  <!-- Audio local oculto que se reproduce solo -->
+  <!-- Audio local oculto -->
   <audio id="background-audio" loop preload="auto">
     <source src="blue.mp3" type="audio/mpeg">
   </audio>
 
   <script>
+    // Rotación de fotos adicionales al presionar el botón
+    const fotos = [
+      "https://i.postimg.cc/Z5y3fZWk/IMG-20260417-WA0068.jpg",
+      // Puedes agregar más enlaces de fotos aquí si gustas separados por comas
+    ];
+    let fotoActual = 0;
+    function cambiarRecuerdo() {
+      // Pequeño efecto visual al cambiar
+      const img = document.getElementById('foto-principal');
+      img.style.opacity = 0;
+      setTimeout(() => {
+        // Si agregas más enlaces en el arreglo "fotos", irán rotando aquí
+        img.style.opacity = 1;
+      }, 300);
+    }
+
+    // Contador de tiempo desde enero de 2021
+    function actualizarContador() {
+      const inicio = new Date('2021-01-01T00:00:00');
+      const ahora = new Date();
+      
+      let anos = ahora.getFullYear() - inicio.getFullYear();
+      let meses = ahora.getMonth() - inicio.getMonth();
+      let dias = ahora.getDate() - inicio.getDate();
+      let horas = ahora.getHours() - inicio.getHours();
+      let minutos = ahora.getMinutes() - inicio.getMinutes();
+      let segundos = ahora.getSeconds() - inicio.getSeconds();
+
+      if (segundos < 0) { segundos += 60; minutos--; }
+      if (minutos < 0) { minutos += 60; horas--; }
+      if (horas < 0) { horas += 24; dias--; }
+      if (dias < 0) {
+        const mesAnterior = new Date(ahora.getFullYear(), ahora.getMonth() - 1, inicio.getDate());
+        dias += Math.floor((ahora - mesAnterior) / (1000 * 60 * 60 * 24));
+        meses--;
+      }
+      if (meses < 0) { meses += 12; anos--; }
+
+      document.getElementById('contador').innerHTML = 
+        `${anos} años, ${meses} meses, ${dias}d ${horas}h ${minutos}m ${segundos}s`;
+    }
+    setInterval(actualizarContador, 1000);
+
     const overlay = document.getElementById('overlay');
     const cartaSorpresa = document.getElementById('carta-sorpresa');
     const backgroundAudio = document.getElementById('background-audio');
@@ -208,30 +288,24 @@
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     document.body.appendChild(renderer.domElement);
 
-    // --- GENERACIÓN DE CORAZÓN VOLUMÉTRICO EN 3D CON TEXTURA ---
+    // --- CORAZÓN VOLUMÉTRICO EN 3D CON TEXTURA ---
     const particleCount = isMobile ? 1500 : 3500;
     const vertices = [];
     const colors = [];
     const tl = gsap.timeline({ paused: true });
 
-    // Colores base para dar profundidad y textura (Tonos rosados, rojos intensos y blancos de brillo)
     const colorInside = new THREE.Color(0xff5588);
     const colorEdge = new THREE.Color(0xff0044);
     const colorCore = new THREE.Color(0xffffff);
 
     for (let i = 0; i < particleCount; i++) {
-      // Ecuación paramétrica matemática del corazón en 3D
       const t = Math.PI * 2 * Math.random();
       const u = Math.PI * (Math.random() - 0.5);
 
-      // Coordenadas base del corazón
       let x = 16 * Math.pow(Math.sin(t), 3);
       let y = 13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t);
-      
-      // Añadir volumen y profundidad real en el eje Z distribuyendo las partículas
       let z = (Math.random() - 0.5) * 14 * Math.sin(Math.abs(u));
 
-      // Escalar tamaño general del corazón
       const scale = isMobile ? 2.2 : 2.8;
       x *= scale;
       y *= scale;
@@ -241,7 +315,6 @@
       const targetY = y;
       const targetZ = z;
 
-      // Posición inicial aleatoria desde donde vuelan las partículas al formarse
       const vector = new THREE.Vector3(
         (Math.random() - 0.5) * 250,
         (Math.random() - 0.5) * 250,
@@ -250,7 +323,6 @@
       
       vertices.push(vector);
 
-      // Asignar colores con textura (el centro/núcleo más claro, los bordes más intensos)
       const distFromCenter = Math.sqrt(x*x + y*y);
       let mixedColor = colorEdge.clone();
       if (distFromCenter < 15) {
@@ -260,7 +332,6 @@
       }
       colors.push(mixedColor.r, mixedColor.g, mixedColor.b);
 
-      // Animación de dispersión a la forma final con GSAP
       tl.to(vector, {
         x: targetX,
         y: targetY,
@@ -274,7 +345,6 @@
     const positions = new Float32Array(vertices.length * 3);
     const colorsAttr = new Float32Array(colors);
 
-    // Actualizar posiciones iniciales
     for (let i = 0; i < vertices.length; i++) {
       positions[i * 3] = vertices[i].x;
       positions[i * 3 + 1] = vertices[i].y;
@@ -330,7 +400,6 @@
       }
       positionAttribute.needsUpdate = true;
 
-      // Suave rotación tridimensional constante combinada con el movimiento del mouse/tacto
       targetRotationY = mouseX + Math.sin(elapsedTime * 0.4) * 0.2;
       targetRotationX = mouseY + Math.cos(elapsedTime * 0.4) * 0.15;
 
