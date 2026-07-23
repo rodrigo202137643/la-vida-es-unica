@@ -12,7 +12,7 @@
       width: 100%;
       height: 100%;
       overflow: hidden; 
-      background-color: #030303; 
+      background-color: #000000; 
       font-family: 'Cinzel', 'Times New Roman', serif;
     }
     
@@ -47,21 +47,21 @@
 
     #btn-comenzar {
       background: transparent;
-      border: 1px solid #8b1e3f;
+      border: 1px solid #ff2a5f;
       color: #ffccd5;
-      padding: 12px 30px;
-      font-size: 1rem;
+      padding: 14px 35px;
+      font-size: 1.1rem;
       letter-spacing: 3px;
       border-radius: 30px;
       cursor: pointer;
       text-transform: uppercase;
-      box-shadow: 0 0 15px rgba(139, 30, 63, 0.4);
+      box-shadow: 0 0 20px rgba(255, 42, 95, 0.6);
       transition: all 0.3s ease;
     }
 
     #btn-comenzar:hover {
-      background-color: #8b1e3f;
-      box-shadow: 0 0 25px rgba(139, 30, 63, 0.8);
+      background-color: #ff2a5f;
+      box-shadow: 0 0 30px rgba(255, 42, 95, 1);
     }
 
     #carta-sorpresa {
@@ -78,27 +78,30 @@
       pointer-events: none;
       opacity: 0;
       transition: opacity 2s ease;
-      background: radial-gradient(circle, rgba(139,30,63,0.2) 0%, rgba(3,3,3,0.9) 80%);
+      background: radial-gradient(circle, rgba(255,42,95,0.2) 0%, rgba(0,0,0,0.92) 80%);
     }
 
     .polaroid-grande {
       background: #111;
-      padding: 12px 12px 32px 12px;
-      border-radius: 8px;
-      border: 1px solid rgba(255, 204, 213, 0.4);
-      box-shadow: 0 0 50px rgba(139, 30, 63, 0.7);
-      width: 250px;
-      max-width: 75vw;
+      padding: 14px 14px 34px 14px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 204, 213, 0.5);
+      box-shadow: 0 0 70px rgba(255, 42, 95, 0.8);
+      width: 260px;
+      max-width: 80vw;
       transform: scale(0.7);
       animation: zoomInFoto 2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-      margin-bottom: 12px;
+      margin-bottom: 15px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
 
     .polaroid-grande img {
       width: 100%;
-      height: 270px;
+      height: 280px;
       object-fit: cover;
-      border-radius: 4px;
+      border-radius: 6px;
       display: block;
     }
 
@@ -111,42 +114,36 @@
     #info-sorpresa {
       text-align: center;
       width: 90%;
-      max-width: 450px;
+      max-width: 480px;
       opacity: 0;
       animation: revealText 2s ease forwards 1s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
 
     #nombre {
       color: #ffccd5;
-      font-size: clamp(2rem, 5vw, 3rem);
+      font-size: clamp(2.2rem, 5vw, 3.2rem);
       font-weight: 300;
       letter-spacing: 6px;
       text-transform: uppercase;
-      text-shadow: 0 0 15px rgba(139, 30, 63, 0.9), 0 0 30px rgba(139, 30, 63, 0.6);
-      margin-bottom: 6px;
+      text-shadow: 0 0 25px rgba(255, 42, 95, 1), 0 0 50px rgba(255, 42, 95, 0.7);
+      margin-bottom: 8px;
     }
 
     .frase-amor {
-      color: #e6a1b2;
-      font-size: 0.95rem;
+      color: #ffb3c1;
+      font-size: 1rem;
       letter-spacing: 2px;
       font-style: italic;
-      line-height: 1.5;
-      text-shadow: 0 0 10px rgba(0,0,0,0.8);
+      line-height: 1.6;
+      text-shadow: 0 0 12px rgba(0,0,0,0.9);
+      text-align: center;
     }
 
     @keyframes revealText {
       to { opacity: 1; }
-    }
-
-    .audio-container {
-      position: fixed;
-      bottom: 15px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 10;
-      opacity: 0;
-      transition: opacity 1s ease;
     }
   </style>
   
@@ -170,9 +167,10 @@
     </div>
   </div>
 
-  <div class="audio-container" id="spotify-box">
-    <iframe id="spotify-iframe" style="border-radius:12px" src="" width="260" height="80" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
-  </div>
+  <!-- Audio local oculto que se reproduce solo -->
+  <audio id="background-audio" loop preload="auto">
+    <source src="blue.mp3" type="audio/mpeg">
+  </audio>
 
   <svg width="100" height="100" viewBox="0 0 100 100">
     <path id="rutaCorazon" d="M50,30 C35,10 10,25 10,50 C10,75 35,90 50,90 C65,90 90,75 90,50 C90,25 65,10 50,30 Z" />
@@ -181,17 +179,19 @@
   <script>
     const overlay = document.getElementById('overlay');
     const cartaSorpresa = document.getElementById('carta-sorpresa');
-    const spotifyBox = document.getElementById('spotify-box');
-    const spotifyIframe = document.getElementById('spotify-iframe');
+    const backgroundAudio = document.getElementById('background-audio');
 
     let animacionIniciada = false;
 
+    // Aquí está la magia: al tocar la pantalla, la música arranca sola
     overlay.addEventListener('click', () => {
       if (animacionIniciada) return;
       animacionIniciada = true;
 
-      spotifyIframe.src = "https://open.spotify.com/embed/track/2ezMnGfGww3WSOJp7TwI1N?utm_source=generator&autoplay=1";
-      spotifyBox.style.opacity = 1;
+      backgroundAudio.volume = 1.0;
+      backgroundAudio.play().catch(error => {
+        console.log("Error al reproducir audio:", error);
+      });
 
       overlay.style.opacity = 0;
       setTimeout(() => {
@@ -204,7 +204,7 @@
 
     const scene = new THREE.Scene();
     const isMobile = window.innerWidth < 768;
-    const cameraZ = isMobile ? 145 : 110;
+    const cameraZ = isMobile ? 115 : 80;
     
     const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
     camera.position.z = cameraZ;
@@ -219,28 +219,28 @@
     const vertices = [];
     const tl = gsap.timeline({ paused: true });
 
-    const step = isMobile ? 0.08 : 0.05;
+    const step = isMobile ? 0.04 : 0.02;
     for (let i = 0; i < length; i += step) { 
       const point = path.getPointAtLength(i);
       
-      const scaleSVG = 1.5;
+      const scaleSVG = 1.55; 
       const targetX = (point.x - 50) * scaleSVG;
       const targetY = -((point.y - 50) * scaleSVG);
       const targetZ = 0;
 
       const vector = new THREE.Vector3(
-        (Math.random() - 0.5) * 150,
-        (Math.random() - 0.5) * 150,
-        (Math.random() - 0.5) * 200
+        (Math.random() - 0.5) * 220,
+        (Math.random() - 0.5) * 220,
+        (Math.random() - 0.5) * 280
       );
       
       vertices.push(vector);
 
       tl.to(vector, {
-        x: targetX + (Math.random() - 0.5) * 2,
-        y: targetY + (Math.random() - 0.5) * 2,
-        z: targetZ + (Math.random() - 0.5) * 8,
-        duration: "random(2.5, 4.5)",
+        x: targetX + (Math.random() - 0.5) * 1.0,
+        y: targetY + (Math.random() - 0.5) * 1.0,
+        z: targetZ + (Math.random() - 0.5) * 4,
+        duration: "random(1.8, 3.5)",
         ease: "power3.inOut"
       }, i * 0.0003);
     }
@@ -250,10 +250,10 @@
     geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
 
     const material = new THREE.PointsMaterial({ 
-      color: 0x8b1e3f, 
-      size: isMobile ? 1.6 : 1.2, 
+      color: 0xff0055,
+      size: isMobile ? 2.5 : 1.8,
       transparent: true, 
-      opacity: 0.9,
+      opacity: 1.0,
       blending: THREE.AdditiveBlending,
       depthWrite: false
     });
@@ -271,14 +271,14 @@
     let targetRotationY = 0;
 
     window.addEventListener('mousemove', (event) => {
-      mouseX = (event.clientX - window.innerWidth / 2) * 0.0008;
-      mouseY = (event.clientY - window.innerHeight / 2) * 0.0008;
+      mouseX = (event.clientX - window.innerWidth / 2) * 0.001;
+      mouseY = (event.clientY - window.innerHeight / 2) * 0.001;
     });
 
     window.addEventListener('touchmove', (event) => {
       if (event.touches.length > 0) {
-        mouseX = (event.touches[0].clientX - window.innerWidth / 2) * 0.001;
-        mouseY = (event.touches[0].clientY - window.innerHeight / 2) * 0.001;
+        mouseX = (event.touches[0].clientX - window.innerWidth / 2) * 0.0012;
+        mouseY = (event.touches[0].clientY - window.innerHeight / 2) * 0.0012;
       }
     }, { passive: true });
 
@@ -308,7 +308,7 @@
 
     window.addEventListener('resize', () => {
       const mobileCheck = window.innerWidth < 768;
-      camera.position.z = mobileCheck ? 145 : 110;
+      camera.position.z = mobileCheck ? 115 : 80;
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(window.innerWidth, window.innerHeight);
